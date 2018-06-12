@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>jQuery UI Sortable - Display as grid</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+        crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+        crossorigin="anonymous"></script>
+    <script>
+
+        $('document').ready(function () {
+            var nbCases = 16;
+            var largeurTab = Math.sqrt(nbCases);
+            var positions = [];
+            var nullPosition = [];
+
+            function setBoard(){
+                var currentValue = 1;
+                for(x=0;x<nbCases/largeurTab;x++){
+                    positions.push([]);
+                    for(y=0;y<largeurTab;y++){
+                        positions[x].push(currentValue);
+                        currentValue++;
+                    }
+                }
+                positions[(nbCases/largeurTab)-1][largeurTab-1]= null;
+                return positions;                
+            }
+
+            function setNullPosition(){
+                for(y=0; y<positions.length;y++){
+                    for(x=0; x<positions[y].length;x++){
+                        if(positions[y][x]==null){
+                            nullPosition.length = 0;
+                            nullPosition.push(y,x);
+                        }
+                    }
+                }
+            }
+
+            function createTable(){
+                $('#plateau tbody').empty();
+
+                for(y=0;y<positions.length;y++){
+                    $('#plateau tbody').append('<tr>');
+                    for(x=0;x<positions[y].length;x++){
+                        $('tr:last').append("<td value='"+positions[y][x]+"'>"+positions[y][x]+"</td>");
+                        $('td:last').data({
+                            x : x,
+                            y : y
+                        });
+                    }
+                }
+            }
+
+            function colorize(){
+                var y = nullPosition[0];
+                var x = nullPosition[1];
+                $('tr:eq('+y+') td:eq('+x+')').addClass('bg-danger');
+                if((y-1)>=0){
+                    $('tr:eq('+(y-1)+') td:eq('+x+')').addClass('bg-warning');
+                }
+                $('tr:eq('+(y+1)+') td:eq('+x+')').addClass('bg-warning');
+                if((x-1)>=0){
+                    $('tr:eq('+y+') td:eq('+(x-1)+')').addClass('bg-warning');
+                }
+                $('tr:eq('+y+') td:eq('+(x+1)+')').addClass('bg-warning'); 
+            }
+
+            function fresh(){
+                createTable();
+                setNullPosition();
+                colorize();
+                $('.bg-warning').on('click',function(){
+                permute($(this));
+                })
+               congrats(checkWin());
+                
+            }
+
+            function permute(elem){
+                var y = elem.data('y');
+                var x = elem.data('x');
+                var value = positions[y][x];
+                positions[y][x]= null;
+                positions[nullPosition[0]][nullPosition[1]] = value;
+                fresh();
+            };
+
+            function checkWin(){
+                var check = [];
+                for(y=0;y<positions.length;y++){
+                    for(x=0;x<positions[y].length;x++){
+                        check.push(positions[y][x]);
+                    }
+                }
+                for(i=0;i<check.length-1;i++){
+                    if(check[i] != i+1){
+                        return false;
+                    } 
+                }
+                return true;
+            }
+
+            function congrats(win){
+                win ? $('h1').show() : $('h1').hide();
+            }  
+            setBoard();
+            fresh();
+        });
+
+
+
+
+    </script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-8">
+                <table id="plateau" class="table table-bordered ">
+            <tbody></tbody>
+        </table>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-3">
+                <h1>Wahou !</h1>
+            </div>
+        </div>
+        
+
+    </div>
+
+
+</body>
+
+</html>
