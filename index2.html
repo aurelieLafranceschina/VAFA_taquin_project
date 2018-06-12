@@ -20,6 +20,7 @@
             var nbCases = 16;
             var largeurTab = Math.sqrt(nbCases);
             var positions = [];
+            var originPositions = [];
             var nullPosition = [];
 
             function setBoard(){
@@ -32,7 +33,12 @@
                     }
                 }
                 positions[(nbCases/largeurTab)-1][largeurTab-1]= null;
-                return positions;                
+                for(i=0;i<positions.length;i++){
+                    originPositions[i] = [];
+                    for(x=0;x<positions[i].length;x++){
+                        originPositions[i][x] = positions[i][x] ;
+                    }
+                }           
             }
 
             function setNullPosition(){
@@ -48,7 +54,6 @@
 
             function createTable(){
                 $('#plateau tbody').empty();
-
                 for(y=0;y<positions.length;y++){
                     $('#plateau tbody').append('<tr>');
                     for(x=0;x<positions[y].length;x++){
@@ -80,7 +85,10 @@
                 setNullPosition();
                 colorize();
                 $('.bg-warning').on('click',function(){
-                permute($(this));
+                    permute($(this));
+                })
+                $('button').on('click',function(){
+                    reload();
                 })
                congrats(checkWin());
                 
@@ -112,7 +120,17 @@
 
             function congrats(win){
                 win ? $('h1').show() : $('h1').hide();
-            }  
+            }
+
+            function reload() {
+                for(i=0;i<positions.length;i++){
+                    for(x=0;x<positions[i].length;x++){
+                        positions[i][x] = originPositions[i][x];
+                    }
+                }
+                fresh();
+            }
+            
             setBoard();
             fresh();
         });
@@ -137,7 +155,11 @@
                 <h1>Wahou !</h1>
             </div>
         </div>
-        
+        <div class="row justify-content-center">
+                <div class="col-3">
+                    <button class="btn btn-primary">Recommencer</button>
+                </div>
+            </div>
 
     </div>
 
